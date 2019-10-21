@@ -1,6 +1,6 @@
 provider "aws" {
   profile = "cloud"
-  region  = var.region
+  region  = var.cloud
 }
 
 resource "aws_instance" "example" {
