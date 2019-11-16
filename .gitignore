@@ -1,2 +1,6 @@
-.terraform/plugins
+tf/.terraform
 .mypy_cache
+*.tfstate
+*.backup
+.vscode
+*.pyc

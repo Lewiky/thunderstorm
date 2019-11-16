@@ -41,7 +41,9 @@ def find(rang=(0, 2**32), difficulty=9) -> int:
 
 
 def verify_params(params: dict):
-    if not (params['high'] and params['low'] and params['difficulty']):
+    logging.info(params)
+    if not params['high'] and not params['low'] and not params['difficulty']:
+        logging.error(f'Invalid params {params}')
         return None
     return params
 
@@ -49,11 +51,12 @@ def verify_params(params: dict):
 def pull_queue(sqs) -> dict:
     queue_name: str = os.environ.get('SQS_INPUT_QUEUE_NAME')
     queue = sqs.get_queue_by_name(QueueName=queue_name)
-    for message in queue.receive_message():
+    for message in queue.receive_messages():
         try:
             params = json.loads(message.body)
             v_params = verify_params(params)
-            if v_params:
+            if v_params is not None:
+                message.delete()
                 return v_params
         except NameError:
             logging.error(f'Malformed input message: {message}')
@@ -64,7 +67,7 @@ def push_queue(sqs, nonce):
     logging.info(f'Pushing nonce: {nonce} to queue')
     queue_name: str = os.environ.get('SQS_OUTPUT_QUEUE_NAME')
     queue = sqs.get_queue_by_name(QueueName=queue_name)
-    response = queue.send_message(MessageBody=nonce)
+    response = queue.send_message(MessageBody=json.dumps({'nonce': nonce}))
     if not response.get('MessageId'):
         logging.error('Could not push result to queue')
 
@@ -72,6 +75,6 @@ def push_queue(sqs, nonce):
 if __name__ == '__main__':
     sqs = boto3.resource('sqs')
     params = pull_queue(sqs)
-    nonce = find((int(params['high']), int(
-        params['low'])), params['difficulty'])
+    nonce = find((int(params['low']), int(
+        params['high'])), params['difficulty'])
     push_queue(sqs, nonce)
