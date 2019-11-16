@@ -42,7 +42,7 @@ def find(rang=(0, 2**32), difficulty=9) -> int:
 
 def verify_params(params: dict):
     logging.info(params)
-    if not params['high'] and not params['low'] and not params['difficulty']:
+    if not params['high'] or not params['low'] or not params['difficulty']:
         logging.error(f'Invalid params {params}')
         return None
     return params
