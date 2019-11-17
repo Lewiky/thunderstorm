@@ -42,10 +42,10 @@ def find(rang=(0, 2**32), difficulty=9) -> int:
 
 def verify_params(params: dict):
     logging.info(params)
-    if not params['high'] or not params['low'] or not params['difficulty']:
-        logging.error(f'Invalid params {params}')
-        return None
-    return params
+    if 'high' in params and 'low' in params and 'difficulty' in params:
+        return params
+    logging.error(f'Invalid params {params}')
+    return None
 
 
 def pull_queue(sqs) -> dict:
