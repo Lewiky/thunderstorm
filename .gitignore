@@ -4,3 +4,4 @@ tf/.terraform
 *.backup
 .vscode
 *.pyc
+venv

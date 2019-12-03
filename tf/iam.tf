@@ -130,7 +130,7 @@ resource "aws_iam_policy" "lambda_exec_ecs" {
   "Statement": [
     {
       "Action": [
-        "ecs:RunTask",
+        "ecs:*",
         "sqs:*",
         "iam:PassRole"
       ],

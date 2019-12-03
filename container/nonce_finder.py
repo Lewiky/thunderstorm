@@ -29,20 +29,24 @@ def apply_sha(nonce: bytes, block: bytes, difficulty: int = 32) -> bool:
     return is_golden(sqr_hsh, difficulty)
 
 
-def find(rang=(0, 2**32), difficulty=9) -> int:
+def find(rang=(0, 2**32), difficulty=9, block="COMSM0010cloud") -> int:
+    logging.info(f'Starting search in range {rang}')
     r = 0
     iterator = range(rang[0], rang[1])
-    block = "COMSM0010cloud".encode('utf-8')
+    block = block.encode('utf-8')
     while not apply_sha(b_str(iterator[r]), block, difficulty=difficulty):
         logging.debug(f'Trying: {iterator[r]}')
         r += 1
+        if r > rang[1]:
+            logging.info('No Found Nonce')
+            return -1 
     logging.info(f'found Nonce: {iterator[r]}')
     return iterator[r]
 
 
 def verify_params(params: dict):
     logging.info(params)
-    if 'high' in params and 'low' in params and 'difficulty' in params:
+    if 'high' in params and 'low' in params and 'difficulty' and 'block' in params:
         return params
     logging.error(f'Invalid params {params}')
     return None
@@ -76,5 +80,5 @@ if __name__ == '__main__':
     sqs = boto3.resource('sqs')
     params = pull_queue(sqs)
     nonce = find((int(params['low']), int(
-        params['high'])), params['difficulty'])
+        params['high'])), params['difficulty'], params['block'])
     push_queue(sqs, nonce)
