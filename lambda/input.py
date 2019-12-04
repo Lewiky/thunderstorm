@@ -13,6 +13,18 @@ sqs = boto3.resource('sqs')
 MAX_SEARCH = 2**32
 TIME_TO_SEARCH = 500*15 #Takes 15 nodes 500 sec on average to search whole space
 
+def calculate_workers(confidence, difficulty, time):
+    harding_metric   = math.log(1-confidence)/math.log(1-(0.5**difficulty)) #Derived number of instances to search from poisson distribution
+    logging.info(f'Harding: {harding_metric}')
+    amount_to_search = min(MAX_SEARCH, harding_metric) #Worst case is searching the whole space
+    if(confidence >= 1):
+        amount_to_search = MAX_SEARCH
+    search_per_second = MAX_SEARCH/TIME_TO_SEARCH # How many searches can one node do per second?
+    time_required = amount_to_search/search_per_second + 30  # How much time do we need to search for? + startup time
+    logging.info(f'Time Required: {time_required}')
+    return math.ceil(time_required/time) # Need one worker for every extra factor of time 
+
+
 def send_message(low, high, difficulty, block):
     message = json.dumps({'low': low, 'high': high, 'difficulty': difficulty, 'block': block})
     queue_name = os.environ.get('SQS_INPUT_QUEUE_NAME')
@@ -69,7 +81,7 @@ def request_handler(event, context):
     if 'workers' in params.keys():
         num_workers = int(params['workers'])
     else:
-        num_workers = math.floor((TIME_TO_SEARCH/int(params['time'])*float(params['confidence'])))
+        num_workers = calculate_workers(float(params['confidence']), int(params['difficulty']), int(params['time']))
     for i in range(num_workers):
         start_task()
         send_message(i*(MAX_SEARCH//num_workers),
