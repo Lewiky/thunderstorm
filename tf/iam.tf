@@ -1,10 +1,10 @@
-  
+
 # ECS task execution role data
 data "aws_iam_policy_document" "ecs_task_execution_role" {
   version = "2012-10-17"
   statement {
-    sid = ""
-    effect = "Allow"
+    sid     = ""
+    effect  = "Allow"
     actions = ["sts:AssumeRole"]
 
     principals {
@@ -17,8 +17,8 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
 data "aws_iam_policy_document" "ecs_task_role" {
   version = "2012-10-17"
   statement {
-    sid = ""
-    effect = "Allow"
+    sid     = ""
+    effect  = "Allow"
     actions = ["sts:AssumeRole"]
 
     principals {
@@ -35,8 +35,8 @@ resource "aws_iam_role" "ecs_task_execution_role" {
 }
 
 resource "aws_iam_role" "ecs_task_role" {
-    name               = "ecs_task_role"
-    assume_role_policy = data.aws_iam_policy_document.ecs_task_role.json
+  name               = "ecs_task_role"
+  assume_role_policy = data.aws_iam_policy_document.ecs_task_role.json
 }
 
 # ECS task execution role policy attachment
@@ -51,7 +51,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_role" {
 }
 
 resource "aws_iam_role" "lambda_exec" {
-    name = "thunderstorm_lambda_role"
+  name = "thunderstorm_lambda_role"
 
   assume_role_policy = <<EOF
 {
@@ -71,8 +71,8 @@ EOF
 }
 
 resource "aws_iam_policy" "ecs_task_role" {
-  name = "ecs_task_role"
-  path = "/"
+  name        = "ecs_task_role"
+  path        = "/"
   description = "IAM policy for the ecs task"
 
   policy = <<EOF
@@ -92,8 +92,8 @@ EOF
 }
 
 resource "aws_iam_policy" "lambda_logging" {
-  name = "lambda_logging"
-  path = "/"
+  name        = "lambda_logging"
+  path        = "/"
   description = "IAM policy for logging from a lambda"
 
   policy = <<EOF
@@ -115,16 +115,16 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
-  role = "${aws_iam_role.lambda_exec.name}"
+  role       = "${aws_iam_role.lambda_exec.name}"
   policy_arn = "${aws_iam_policy.lambda_logging.arn}"
 }
 
 resource "aws_iam_policy" "lambda_exec_ecs" {
-    name = "lambda_exec_ecs"
-    path = "/"
-   description = "IAM policy for executing ecs containers"
+  name        = "lambda_exec_ecs"
+  path        = "/"
+  description = "IAM policy for executing ecs containers"
 
-   policy = <<EOF
+  policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -143,6 +143,6 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_exec_ecs" {
-  role = "${aws_iam_role.lambda_exec.name}"
+  role       = "${aws_iam_role.lambda_exec.name}"
   policy_arn = "${aws_iam_policy.lambda_exec_ecs.arn}"
 }

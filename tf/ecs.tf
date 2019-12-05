@@ -1,5 +1,5 @@
 resource "aws_ecs_cluster" "main" {
-    name = "nonce-cluster"
+  name = "nonce-cluster"
 }
 
 resource "aws_ecs_task_definition" "app" {
@@ -10,16 +10,16 @@ resource "aws_ecs_task_definition" "app" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = var.fargate_cpu
   memory                   = var.fargate_memory
-  container_definitions    = templatefile("./templates/nonce-app.json.tpl", 
+  container_definitions = templatefile("./templates/nonce-app.json.tpl",
     {
-        app_image      = var.app_image
-        app_port       = var.app_port
-        fargate_cpu    = var.fargate_cpu
-        fargate_memory = var.fargate_memory
-        aws_region     = var.region
-        input_queue    = aws_sqs_queue.nonce-input-queue.name
-        output_queue   = aws_sqs_queue.nonce-output-queue.name
-    })
+      app_image      = var.app_image
+      app_port       = var.app_port
+      fargate_cpu    = var.fargate_cpu
+      fargate_memory = var.fargate_memory
+      aws_region     = var.region
+      input_queue    = aws_sqs_queue.nonce-input-queue.name
+      output_queue   = aws_sqs_queue.nonce-output-queue.name
+  })
 }
 
 resource "aws_ecs_service" "main" {
@@ -30,7 +30,7 @@ resource "aws_ecs_service" "main" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets = aws_subnet.private.*.id
+    subnets          = aws_subnet.private.*.id
     assign_public_ip = true
   }
 

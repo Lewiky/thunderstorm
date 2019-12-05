@@ -12,12 +12,12 @@ variable "app_image" {
 
 variable "ecs_task_execution_role_name" {
   description = "ECS task execution role name"
-  default = "cloud_ecs_task_execution_role"
+  default     = "cloud_ecs_task_execution_role"
 }
 
 variable "ecs_auto_scale_role_name" {
   description = "ECS auto scale role Name"
-  default = "cloud_ecs_auto_scale_role"
+  default     = "cloud_ecs_auto_scale_role"
 }
 
 variable "az_count" {
