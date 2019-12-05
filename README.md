@@ -16,7 +16,7 @@ Coursework for COMSM0010 Cloud Computing
 
 ## How To Run
 
-1. Build the docker container and push to ECR via usual methods
+1. Build the docker container and push to ECR via [usual methods](https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-push-ecr-image.html)
 
 2. Zip up lambda functions into deployment zips and push these to their appropriate S3 locations
 
