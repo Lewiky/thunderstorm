@@ -9,11 +9,13 @@ ecs = boto3.client('ecs')
 sqs = boto3.resource('sqs')
 
 def request_handler(event, context):
+    # Get variables and setup queues
     cluster = os.environ.get('ECS_CLUSTER_NAME')
     out_queue_name = os.environ.get('SQS_OUTPUT_QUEUE')
     out_queue = sqs.get_queue_by_name(QueueName=out_queue_name)
     in_queue_name = os.environ.get('SQS_INPUT_QUEUE')
     in_queue = sqs.get_queue_by_name(QueueName=in_queue_name)
+    # Stop all tasks on the cluster with the nonce discovery task definition
     tasks = ecs.list_tasks(
         cluster= cluster,
         family=os.environ.get('ECS_TASK_FAMILY_NAME')
@@ -25,6 +27,7 @@ def request_handler(event, context):
             task= task
         )
     logging.info('Stopped all running tasks')
+    #Purge the input and output queues
     out_queue.purge()
     in_queue.purge()
     logging.info('Purged Queues')

@@ -14,6 +14,9 @@ MAX_SEARCH = 2**32
 TIME_TO_SEARCH = 500*15 #Takes 15 nodes 500 sec on average to search whole space
 
 def calculate_workers(confidence, difficulty, time):
+    '''
+    Calculate number of workers required to satisfy user requirements
+    '''
     harding_metric   = math.log(1-confidence)/math.log(1-(0.5**difficulty)) #Derived number of instances to search from poisson distribution
     logging.info(f'Harding: {harding_metric}')
     amount_to_search = min(MAX_SEARCH, harding_metric) #Worst case is searching the whole space
@@ -26,6 +29,9 @@ def calculate_workers(confidence, difficulty, time):
 
 
 def send_message(low, high, difficulty, block):
+    '''
+    Push one job description to the queue in the proper JSON format
+    '''
     message = json.dumps({'low': low, 'high': high, 'difficulty': difficulty, 'block': block})
     queue_name = os.environ.get('SQS_INPUT_QUEUE_NAME')
     queue = sqs.get_queue_by_name(QueueName=queue_name)
@@ -34,6 +40,9 @@ def send_message(low, high, difficulty, block):
         logging.error('Could not push input to queue')
 
 def start_task():
+    '''
+    Start one copy of the ECS task in Fargate mode
+    '''
     try:
         response = ecs.run_task(
             cluster=os.environ.get('ECS_CLUSTER_NAME'),
@@ -74,6 +83,10 @@ def respond(body, status=200):
     }
 
 def request_handler(event, context):
+    '''
+    Lambda entry point
+    Calculate the number of workers required and start that many tasks
+    '''
     params = event['queryStringParameters']
     if not validate_params(params):
         return respond({'error': 'Invalid Params', 'params': params, 'success': False}, 400)

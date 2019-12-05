@@ -5,3 +5,4 @@ tf/.terraform
 .vscode
 *.pyc
 venv
+*.zip

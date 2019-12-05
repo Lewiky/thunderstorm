@@ -8,6 +8,9 @@ logging.basicConfig(level=logging.INFO)
 sqs = boto3.resource('sqs')
 
 def request_handler(event, context):
+    '''
+    Get all available messages and return them to the user
+    '''
     out_queue_name = os.environ.get('SQS_OUTPUT_QUEUE')
     out_queue = sqs.get_queue_by_name(QueueName=out_queue_name)
     messages = out_queue.receive_messages(WaitTimeSeconds=20)

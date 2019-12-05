@@ -7,6 +7,7 @@ import sys
 
 endpoint = 'https://6df9f9687c.execute-api.us-east-1.amazonaws.com/main'
 
+#Setup command line arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('--difficulty', type=int)
 parser.add_argument('--time', type=int)
@@ -16,17 +17,25 @@ parser.add_argument('--workers', type=int, default=None)
 args = parser.parse_args()
 
 def print_dict(dict):
+    '''
+    Helper function for printing dictionaries nicely 
+    '''
     for key in dict.keys():
         print(f'{key}: {dict[key]}')
 
 def sig_handler(sig, frame):
+    '''
+    Gracefully shutdown system
+    '''
     print('Shutting Down....')
     r = requests.delete(endpoint+'/kill')
     print_dict(r.json())
     sys.exit(0)
 
+#SIGINT handler - stop early
 signal.signal(signal.SIGINT, sig_handler)
 
+#Start tasks
 start = time.time()
 params = {'difficulty': args.difficulty, 'time': args.time, 'block': args.block, 'confidence': args.confidence}
 if args.workers:
@@ -34,6 +43,7 @@ if args.workers:
 r = requests.post(endpoint + '/start',params=params)
 print_dict(r.json())
 
+#poll for messages
 messages = []
 while len(messages) == 0:
     r = requests.get(endpoint + '/output')
@@ -44,6 +54,7 @@ while len(messages) == 0:
     if 'messages' in j:
         messages = j['messages']
     if(time.time() - start > args.time):
+        #Shutdown system after user timeout
         print("Out of time...")
         sig_handler(None, None)
 for message in messages:
