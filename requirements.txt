@@ -2,6 +2,7 @@ boto3
 aws #for using aws cli
 requests
 #For data exploration notebook
+jupyter
 numpy
 pandas
 matplotlib
