@@ -1,0 +1,9 @@
+boto3
+aws #for using aws cli
+requests
+#For data exploration notebook
+numpy
+pandas
+matplotlib
+seaborn
+scipy
